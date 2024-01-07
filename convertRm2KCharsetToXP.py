@@ -1,14 +1,37 @@
 #  python .\convertRm2KCharsetToXP.py
 #  pip3 install pillow
+import argparse
+import os
+import sys
 from PIL import Image
 
-def convert_image():
+def parse_arguments():
+  parser = argparse.ArgumentParser(description="Script to convert RM2K charsets to XP sprites.")
+  parser.add_argument("file_path", help="Path to the file (mandatory)")
+  parser.add_argument("--no-remove", action="store_true", help="Disables removing abundant color if set")
+
+  args = parser.parse_args()
+
+  if not os.path.exists(args.file_path):
+      print(f"Error: File '{args.file_path}' does not exist.")
+      sys.exit()
+
+  filename = extract_filename_from_path(args.file_path)
+  print(f"File name extracted from path: {filename}")
+
+  return args.file_path, args.no_remove
+
+def extract_filename_from_path(file_path):
+  return os.path.basename(file_path)
+
+def convert_image(image_path, should_not_remove_abundant_color):
   # Open the original image and get its dimensions
-  img = Image.open("example.png")
+  img = Image.open(image_path)
   img = img.convert("RGBA")
   width, height = img.size
 
-  remove_most_abundant_color(img, width, height)
+  if should_not_remove_abundant_color == False:
+    remove_most_abundant_color(img, width, height)
 
   # Define the dimensions of the smaller pictures
   small_width = 72
@@ -20,7 +43,6 @@ def convert_image():
       # Crop a smaller picture from the original image
       small_pic = img.crop((l, k, l + small_width, k + small_height))
       # Save the smaller picture with a unique name
-      #small_pic.save(f"new_{k + l + 1}.png", bits=24)
       reorder(small_pic, k + l + 1)
 
 def remove_most_abundant_color(img, width, height):
@@ -99,7 +121,8 @@ def reorder(img, fileIndex):
   new_img.save(f"new_{fileIndex}.png", bits=24)
 
 def main():
-  convert_image()
+  file_path, should_not_remove_abundant_color = parse_arguments()  
+  convert_image(file_path, should_not_remove_abundant_color)
 
 if __name__ == "__main__":
   main()
