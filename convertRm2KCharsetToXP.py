@@ -2,6 +2,27 @@
 #  pip3 install pillow
 from PIL import Image
 
+def convert_image():
+  # Open the original image and get its dimensions
+  img = Image.open("example.png")
+  img = img.convert("RGBA")
+  width, height = img.size
+
+  remove_most_abundant_color(img, width, height)
+
+  # Define the dimensions of the smaller pictures
+  small_width = 72
+  small_height = 128
+
+  # Loop through the original image and crop it into smaller pictures
+  for k in range(0, height, small_height):
+    for l in range(0, width, small_width):
+      # Crop a smaller picture from the original image
+      small_pic = img.crop((l, k, l + small_width, k + small_height))
+      # Save the smaller picture with a unique name
+      #small_pic.save(f"new_{k + l + 1}.png", bits=24)
+      reorder(small_pic, k + l + 1)
+
 def remove_most_abundant_color(img, width, height):
     color_freq = {}
 
@@ -77,25 +98,8 @@ def reorder(img, fileIndex):
   # Save the new image
   new_img.save(f"new_{fileIndex}.png", bits=24)
 
-# Open the original image and get its dimensions
-img = Image.open("example.png")
-img = img.convert("RGBA")
-width, height = img.size
+def main():
+  convert_image()
 
-mode = img.mode
-palette = img.palette
-
-remove_most_abundant_color(img, width, height)
-
-# Define the dimensions of the smaller pictures
-small_width = 72
-small_height = 128
-
-# Loop through the original image and crop it into smaller pictures
-for k in range(0, height, small_height):
-  for l in range(0, width, small_width):
-    # Crop a smaller picture from the original image
-    small_pic = img.crop((l, k, l + small_width, k + small_height))
-    # Save the smaller picture with a unique name
-    #small_pic.save(f"new_{k + l + 1}.png", bits=24)
-    reorder(small_pic, k + l + 1)
+if __name__ == "__main__":
+  main()
