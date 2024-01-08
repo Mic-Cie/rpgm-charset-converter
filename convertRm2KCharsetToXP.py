@@ -16,17 +16,16 @@ def parse_arguments():
       print(f"Error: File '{args.file_path}' does not exist.")
       sys.exit()
 
-  filename = extract_filename_from_path(args.file_path)
-  print(f"File name extracted from path: {filename}")
-
   return args.file_path, args.no_remove
 
 def extract_filename_from_path(file_path):
-  return os.path.basename(file_path)
+  filename_with_extension = os.path.basename(file_path)
+  return os.path.splitext(filename_with_extension)[0]
 
 def convert_image(image_path, should_not_remove_abundant_color):
   # Open the original image and get its dimensions
   img = Image.open(image_path)
+  filename = extract_filename_from_path(image_path)
   img = img.convert("RGBA")
   width, height = img.size
 
@@ -43,7 +42,7 @@ def convert_image(image_path, should_not_remove_abundant_color):
       # Crop a smaller picture from the original image
       small_pic = img.crop((l, k, l + small_width, k + small_height))
       # Save the smaller picture with a unique name
-      reorder(small_pic, k + l + 1)
+      reorder(small_pic, filename, k + l + 1)
 
 def remove_most_abundant_color(img, width, height):
     color_freq = {}
@@ -73,7 +72,7 @@ def remove_most_abundant_color(img, width, height):
             if r == r2 and g == g2 and b == b2 and a == a2:
                 img.putpixel((x, y), (0, 0, 0, 0))
 
-def reorder(img, fileIndex):
+def reorder(img, filename, fileIndex):
   # Open the original image and get its dimensions
   width, height = img.size
 
@@ -118,7 +117,7 @@ def reorder(img, fileIndex):
   # Scale up the new image by 2 using nearest neighbor interpolation
   new_img = new_img.resize((new_img.width * 2, new_img.height * 2), Image.NEAREST)
   # Save the new image
-  new_img.save(f"new_{fileIndex}.png", bits=24)
+  new_img.save(f"{filename}_{fileIndex}.png", bits=24)
 
 def main():
   file_path, should_not_remove_abundant_color = parse_arguments()  
