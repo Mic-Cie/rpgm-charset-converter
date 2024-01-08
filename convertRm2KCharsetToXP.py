@@ -1,5 +1,3 @@
-#  python .\convertRm2KCharsetToXP.py
-#  pip3 install pillow
 import argparse
 import os
 import sys
@@ -23,7 +21,6 @@ def extract_filename_from_path(file_path):
   return os.path.splitext(filename_with_extension)[0]
 
 def convert_image(image_path, should_not_remove_abundant_color):
-  # Open the original image and get its dimensions
   img = Image.open(image_path)
   filename = extract_filename_from_path(image_path)
   img = img.convert("RGBA")
@@ -116,7 +113,7 @@ def reorder(img, filename, fileIndex):
 
   # Scale up the new image by 2 using nearest neighbor interpolation
   new_img = new_img.resize((new_img.width * 2, new_img.height * 2), Image.NEAREST)
-  # Save the new image
+
   new_img.save(f"{filename}_{fileIndex}.png", bits=24)
 
 def main():
